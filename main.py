@@ -8,77 +8,102 @@ class RenameVideoFiles:
     """
     def __init__(self):
         self.full_path = ""
+        self.renaming_format = ""
         self.title = ""
         self.lang = ""
-        self.type = ""
-        self.season_number = 0
+        self.season_number = -1
 
-    def _check(self):
-        """ Check if attributes are OK """
+    def _check_path(self):
+        """ Check if the path is valid"""
 
-        self.checked = True
-
-        # Check the path
         if not os.path.exists(self.full_path):
-            print(f"Add a valid path (full_path), '{self.full_path}' does not exist")
-            self.checked = False
+            raise ValueError(f"Add a valid path (full_path), '{self.full_path}' does not exist")
+
+    def _get_files(self):
+        """ Get all renammable files from path """
+
+        if os.path.isdir(self.full_path):
+            self.files = [f for f in os.listdir(self.full_path) if f.endswith((".mp4", ".mkv"))]
+        else:
+            self.files = [os.path.basename(self.full_path)]
+
+        self.directory = os.path.dirname(self.full_path)
+
+    def _check_renaming_format(self):
+        """ Check renaming format"""
+
+        if self.renaming_format not in ["movie", "serie"]:
+            raise ValueError(f"'{self.renaming_format}' is not a valid renaming format (renaming_format)")
+
+    def _check_attributes(self):
+        """ Check if other attributes are OK """
 
         # Check the title
         if not self.title or len(self.title) > 100:
-            print("Add a valid title (title)")
-            self.checked = False
+            raise ValueError("Add a valid title (title)")
         
         # Check the language
         if not self.lang or len(self.lang) > 10:
-            print("Add a valid language (lang)")
-            self.checked = False
+            raise ValueError("Add a valid language (lang)")
 
-        # Check the type 
-        if self.type not in ["movie", "serie"]:
-            print("Add a valid video type serie/movie (type)")
-            self.checked = False
-
-        # Check the season number
-        if self.type == "serie" and self.season_number < 1:
-            print("Add a valid season number (season_number)")
-            self.checked = False 
-
-    def _get_files_infos(self):
+        if self.renaming_format == "serie":
+            # Check the season number
+            if self.season_number < 0:
+                raise ValueError("Add a valid season number (season_number)")
+        
+        else:
+            if len(self.files) > 1:
+                raise ValueError("You have to rename one movie at a time")
+    
+    @staticmethod
+    def _get_file_infos(file_path):
         """ Get infos about the video file """
 
-        self._check()
+        cv2video = cv2.VideoCapture(file_path)
+        height = int(cv2video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        width = int(cv2video.get(cv2.CAP_PROP_FRAME_WIDTH))
+        size_mb = int(os.path.getsize(file_path) / 10**6)
+        video_format = file_path.split(".")[-1]
 
-        if self.checked:
-            cv2video = cv2.VideoCapture(self.full_path)
-            self.height = str(int(cv2video.get(cv2.CAP_PROP_FRAME_HEIGHT)))
-            self.width = str(int(cv2video.get(cv2.CAP_PROP_FRAME_WIDTH)))
-            self.size_mb = str(int(os.path.getsize(self.full_path) / 10**6))
-            self.video_format = self.full_path.split(".")[-1]
-
-            self.old_file_name = os.path.basename(self.full_path)
-            self.new_title = "-".join(self.title.split(" ")).lower()
-            self.lang = self.lang.upper()
-            self.season_number = int(self.season_number)
-
+        return {"height":height, "width":width, "size_mb":size_mb, "video_format":video_format}
+    
     def _rename(self):
-        """ Rename the file """
+        """ Rename the file(s) """
         
-        if self.checked:
-            self.new_file_name = self.new_title + "_" + self.width + "x" + self.height + "_" + self.lang + "_" + self.size_mb + "MB" + "." + self.video_format
-            print(self.old_file_name)
-            print(self.new_file_name)
+        new_title = self.title.replace(" ", "-").lower()
+        self.new_files_name = []
+        self.old_files_name = []
 
+        if self.renaming_format == "movie":
+            old_file_path = os.path.join(self.directory, self.files[0])
+            movie_infos = self._get_file_infos(old_file_path)
+            
+            new_file_name = f"{new_title}_{movie_infos['width']}x{movie_infos['height']}_{self.lang}_{movie_infos['size_mb']}MB.{movie_infos['video_format']}"
+            new_file_path = os.path.join(self.directory, new_file_name)
+            self.new_files_name.append(new_file_name)
+            self.old_files_name.append(self.files[0])
+            
+            os.rename(old_file_path, new_file_path)
+
+        if self.renaming_format == "serie":
+            for f in self.files:
+                old_file_path = os.path.join(self.directory, f)
+                movie_infos = self._get_file_infos(old_file_path)
+                episode_number = int(input(f"Numéro de l'épisode '{f}' : "))
+
+                new_file_name = f"{new_title}_S{self.season_number:02d}E{episode_number:02d}_{movie_infos['width']}x{movie_infos['height']}_{self.lang}_{movie_infos['size_mb']}MB.{movie_infos['video_format']}"
+                new_file_path = os.path.join(self.directory, new_file_name)
+                self.new_files_name.append(new_file_name)
+                self.old_files_name.append(f)
+
+                os.rename(old_file_path, new_file_path)
+    
     def rename(self):
         """ Rename method which can be call """
 
-        self._get_files_infos()
+        self._check_path()
+        self._get_files()
+        self._check_renaming_format()
+        self._check_attributes()
+
         self._rename()
-
-
-if __name__ == "__main__":
-    f = RenameVideoFiles()
-    f.full_path = "/home/mathias/Documents/videos/Kimi no na wa (2016)/Kimi no Na wa. (Your Name) [BDRip 1920x1080 x264 AAC] VOSTFR V2.mkv"
-    f.title = "Kimi no Na wa"
-    f.lang = "VOSTFR"
-    f.type = "movie"
-    f.rename()
