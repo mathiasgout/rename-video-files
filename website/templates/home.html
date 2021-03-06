@@ -1,0 +1,19 @@
+{% extends "base.html" %} {% block title %} Home {% endblock title %} {% block
+content %}
+<form method="POST">
+  <div class="form-group text-center">
+    <br />
+    <h3>Selectionnez un ou des fichiers vidéos à renommer.</h3>
+    <br />
+    <input
+      multiple
+      type="file"
+      class="form-control-file text-center"
+      id="pickfiles"
+      name="pickfiles"
+    />
+    <br />
+    <button type="submit" class="btn btn-primary">Renommer</button>
+  </div>
+</form>
+{% endblock content %}
