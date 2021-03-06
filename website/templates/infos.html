@@ -1,13 +1,13 @@
-{% extends "base.html" %} {% block title %} Informations {% endblock title %} {%
+{% extends "base.html" %} {% block title %} Informations sur les videos {% endblock title %} {%
 block content %}
 
 <form action="POST">
 
-  <h4 align="center">Associez chaque épisode à son numéro. </h4>
+  <h4 align="center">Associez chaque épisode de la série à son numéro.</h4>
   {% for name in file_names %}
   <div class="input-group mb-1">
     <div class="input-group-prepend col-11">
-      <span class="input-group-text col-12" id="test">{{name}}</span>
+      <span class="input-group-text col-12">{{name}}</span>
     </div>
     <input type="text" class="form-control text-center" id="list_names" />
   </div>
