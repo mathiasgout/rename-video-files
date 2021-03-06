@@ -1,11 +1,16 @@
 {% extends "base.html" %} {% block title %} Informations {% endblock title %} {%
 block content %}
 
-<div class="input-group">
-  <div class="input-group-prepend col-11">
-    <span class="input-group-text col-12">First and last name</span>
-  </div>
-  <input type="text" class="form-control text-center" />
-</div>
+<form action="POST">
 
+  <h4 align="center">Associez chaque épisode à son numéro. </h4>
+  {% for name in file_names %}
+  <div class="input-group mb-1">
+    <div class="input-group-prepend col-11">
+      <span class="input-group-text col-12" id="test">{{name}}</span>
+    </div>
+    <input type="text" class="form-control text-center" id="list_names" />
+  </div>
+  {% endfor %}
+</form>
 {% endblock content %}
