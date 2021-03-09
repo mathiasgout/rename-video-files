@@ -15,6 +15,8 @@ def home():
     if request.method == "POST":
         file_names = request.form.getlist("pickfiles")
         renaming_type = request.form.get("renaming_type")
+        if renaming_type == "Spécial (OAV)":
+            renaming_type = "Spécial"
 
         # pour garder en mémoire la variable "file_names"
         session["file_names"] = file_names 
@@ -91,7 +93,7 @@ def info():
                 no_error = False
                 flash("Longueur du titre non valable.", category="error")
 
-        elif renaming_type == "Spécial (OAV)":
+        elif renaming_type == "Spécial":
             season = request.form.get("season")
             special = request.form.get("special")
 
@@ -111,7 +113,7 @@ def info():
             if len(titre) < 1 or len(titre) > 100:
                 no_error = False
                 flash("Longueur du titre non valable.", category="error")
-            if len(special) < 1 or len(titre) > 50:
+            if len(special) < 1 or len(special) > 50:
                 no_error = False
                 flash("Longueur du nom spécial non valable.", category="error")
             for value in movies_dict.values():
@@ -145,7 +147,7 @@ def info():
                     new_files_name.append(new_file_name)
                     old_files_name.append(serie)
 
-            if renaming_type == "Spécial (OAV)":
+            if renaming_type == "Spécial":
                 for serie, nb in movies_dict.items():
                     old_file_path = os.path.join(dir_path, serie)
                     movie_infos = get_file_infos(old_file_path)

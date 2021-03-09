@@ -30,7 +30,7 @@ title %} {% block content %}
       value="movies/"
     />
   </div>
-  {% elif renaming_type == "Spécial (OAV)" %}
+  {% elif renaming_type == "Spécial" %}
   <div class="form-group">
     <label for="path">Chemin</label>
     <input
@@ -97,7 +97,7 @@ title %} {% block content %}
         <span class="input-group-text col-12">{{file_names[0]}}</span>
       </div>
     </div>
-    {% elif renaming_type == "Spécial (OAV)"%}
+    {% elif renaming_type == "Spécial"%}
     <div class="form-group">
       <label for="special">Nom spécial</label>
       <input
