@@ -6,55 +6,89 @@ title %} {% block content %}
 </h3>
 <br />
 <form method="POST">
+  {% if renaming_type == "Série" %}
   <div class="form-group">
-    <label for="titre">Titre</label>
+    <label for="path">Chemin</label>
     <input
       type="text"
       class="form-control"
-      id="titre"
-      name="titre"
-      placeholder="Renseignez un titre"
+      id="path"
+      name="path"
+      placeholder="Renseignez un chemin"
+      value="series/"
     />
   </div>
+  {% else %}
   <div class="form-group">
-    <label for="lang">Langue</label>
-    <select class="form-control" id="lang" name="lang">
-      <option>VOSTFR</option>
-      <option>VO</option>
-      <option>VF</option>
-    </select>
-  </div>
-  {% if renaming_type == "Série" %}
-  <div class="form-group">
-    <label for="season">Numéro de saison</label>
+    <label for="path">Chemin</label>
     <input
-      type="number"
+      type="text"
       class="form-control"
-      id="season"
-      name="season"
-      min="0"
-      step="1"
-      placeholder="Renseignez un numéro de saison"
+      id="path"
+      name="path"
+      placeholder="Renseignez un chemin"
+      value="movies/"
     />
   </div>
-  <h5 align="center">Associez chaque épisode de la série à son numéro.</h5>
-  {% for name in file_names %}
-  <div class="input-group mb-1">
-    <div class="input-group-prepend col-11">
-      <span class="input-group-text col-12">{{name}}</span>
+  {% endif %}
+  <form method="POST">
+    <div class="form-group">
+      <label for="titre">Titre</label>
+      <input
+        type="text"
+        class="form-control"
+        id="titre"
+        name="titre"
+        placeholder="Renseignez un titre"
+      />
     </div>
-    <input
-      type="number"
-      class="form-control text-center"
-      id="{{name}}"
-      name="{{name}}"
-      min="0"
-      step="1"
-    />
-  </div>
-  {% endfor %} {% endif %}
-  <br />
-  <!-- type="submit" pour que le formulaire soit "envoyé"-->
-  <button type="submit" class="btn btn-primary">Renommer</button>
+    <div class="form-group">
+      <label for="lang">Langue</label>
+      <select class="form-control" id="lang" name="lang">
+        <option>VOSTFR</option>
+        <option>VO</option>
+        <option>VF</option>
+      </select>
+    </div>
+    {% if renaming_type == "Série" %}
+    <div class="form-group">
+      <label for="season">Numéro de saison</label>
+      <input
+        type="number"
+        class="form-control"
+        id="season"
+        name="season"
+        min="0"
+        step="1"
+        placeholder="Renseignez un numéro de saison"
+      />
+    </div>
+    <h5 align="center">Associez chaque épisode de la série à son numéro.</h5>
+    {% for name in file_names %}
+    <div class="input-group mb-1">
+      <div class="input-group-prepend col-11">
+        <span class="input-group-text col-12">{{name}}</span>
+      </div>
+      <input
+        type="number"
+        class="form-control text-center"
+        id="{{name}}"
+        name="{{name}}"
+        min="0"
+        step="1"
+      />
+    </div>
+    {% endfor %} {% else %}
+    <h5 align="center">Nom de la vidéo selectionnée.</h5>
+    <div class="input-group mb-1">
+      <div class="input-group-prepend col-12">
+        <span class="input-group-text col-12">{{file_names[0]}}</span>
+      </div>
+    </div>
+    {% endif %}
+    <br />
+    <!-- type="submit" pour que le formulaire soit "envoyé"-->
+    <button type="submit" class="btn btn-primary">Renommer</button>
+  </form>
+  {% endblock content %}
 </form>
-{% endblock content %}

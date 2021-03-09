@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% block title %} Actions réalisées {% endblock title
+%} {% block content %}
+<br />
+<h3 align="center">Tableau des actions réalisées.</h3>
+<br />
+<div class="container">
+  <div class="row">
+    <div class="col mb-2 h5" align="center">Anciens noms</div>
+    <div class="col mb-2 h5" align="center">Nouveaux noms</div>
+  </div>
+</div>
+{% for i in range(new_files_name|length)%}
+<div class="container">
+  <div class="row">
+    <div class="col mb-1 ml-1 border rounded">{{old_files_name[i]}}</div>
+    <div class="col mb-1 ml-1 border rounded font-weight-bold">
+      {{new_files_name[i]}}
+    </div>
+  </div>
+</div>
+{% endfor %}
+<br />
+<form method="POST">
+  <div class="btn-group d-flex" role="group">
+    <button
+      type="submit"
+      value="clicked"
+      class="btn btn-primary w-100 mr-3 ml-3 rounded"
+      name="ok_button"
+      id="ok_button"
+    >
+      OK
+    </button>
+    <button
+      type="submit"
+      value="clicked"
+      class="btn btn-primary btn-danger w-100 mr-3 ml-3 rounded"
+      name="cancel_button"
+      id="cancel_button"
+    >
+      Annuler les actions
+    </button>
+  </div>
+</form>
+{% endblock content %}
