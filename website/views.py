@@ -54,13 +54,13 @@ def info():
         lang = request.form.get("lang")
 
         if renaming_type == "Série":
-            season = int(request.form.get("season"))
+            season = request.form.get("season")
 
             # dictionnaire -> {nom des episodes : numéro de l'épisode}
             movies_dict = {}
             for key, value in request.form.items():
                 if key not in ["titre", "lang", "season", "path"]:
-                    movies_dict[key] = int(value)
+                    movies_dict[key] = value
 
             # Vérification série
             for movie in file_names:
@@ -80,7 +80,7 @@ def info():
                     flash("Veuiller renseigner l'ensemble des numéros des épisodes.", category="error")
                     break
         
-        else:
+        elif renaming_type == "Film":
             movies_dict = {file_names[0]:-1}
 
             # Vérification film
@@ -91,11 +91,41 @@ def info():
                 no_error = False
                 flash("Longueur du titre non valable.", category="error")
 
+        elif renaming_type == "Spécial (OAV)":
+            season = request.form.get("season")
+            special = request.form.get("special")
+
+            # dictionnaire -> {nom des episodes : numéro de l'épisode}
+            movies_dict = {}
+            for key, value in request.form.items():
+                if key not in ["titre", "lang", "season", "path", "special"]:
+                    movies_dict[key] = value
+
+            # Vérification spécial
+            for movie in file_names:
+                if not os.path.exists(os.path.join(dir_path, movie)):
+                    no_error = False
+                    print(os.path.join(dir_path, movie))
+                    flash("Le chemin n'est pas bon.", category="error")
+                    break
+            if len(titre) < 1 or len(titre) > 100:
+                no_error = False
+                flash("Longueur du titre non valable.", category="error")
+            if len(special) < 1 or len(titre) > 50:
+                no_error = False
+                flash("Longueur du nom spécial non valable.", category="error")
+            for value in movies_dict.values():
+                if not value:
+                    no_error = False
+                    flash("Veuiller renseigner l'ensemble des numéros des épisodes.", category="error")
+                    break
+
         # Renommage
         if no_error is True:
             new_files_name = []
             old_files_name = []
-            new_title = titre.replace(" ", "-").lower()
+            new_title = titre.strip().replace(" ", "-").lower()
+            special = special.strip().replace(" ", "-").upper()
 
             if renaming_type == "Film":
                 old_file_path = os.path.join(dir_path, file_names[0])
@@ -110,7 +140,20 @@ def info():
                     old_file_path = os.path.join(dir_path, serie)
                     movie_infos = get_file_infos(old_file_path)
 
-                    new_file_name = f"{new_title}_S{season:02d}E{nb:02d}_{movie_infos['width']}x{movie_infos['height']}_{lang}_{movie_infos['size_mb']}MB.{movie_infos['video_format']}" 
+                    new_file_name = f"{new_title}_S{int(season):02d}E{int(nb):02d}_{movie_infos['width']}x{movie_infos['height']}_{lang}_{movie_infos['size_mb']}MB.{movie_infos['video_format']}" 
+                    new_file_path = os.path.join(dir_path, new_file_name)
+                    new_files_name.append(new_file_name)
+                    old_files_name.append(serie)
+
+            if renaming_type == "Spécial (OAV)":
+                for serie, nb in movies_dict.items():
+                    old_file_path = os.path.join(dir_path, serie)
+                    movie_infos = get_file_infos(old_file_path)
+
+                    if season:
+                        new_file_name = f"{new_title}_{special}_S{int(season):02d}E{int(nb):02d}_{movie_infos['width']}x{movie_infos['height']}_{lang}_{movie_infos['size_mb']}MB.{movie_infos['video_format']}" 
+                    else:
+                        new_file_name = f"{new_title}_{special}_E{int(nb):02d}_{movie_infos['width']}x{movie_infos['height']}_{lang}_{movie_infos['size_mb']}MB.{movie_infos['video_format']}" 
                     new_file_path = os.path.join(dir_path, new_file_name)
                     new_files_name.append(new_file_name)
                     old_files_name.append(serie)

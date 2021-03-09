@@ -18,7 +18,7 @@ title %} {% block content %}
       value="series/"
     />
   </div>
-  {% else %}
+  {% elif renaming_type == "Série" %}
   <div class="form-group">
     <label for="path">Chemin</label>
     <input
@@ -28,6 +28,18 @@ title %} {% block content %}
       name="path"
       placeholder="Renseignez un chemin"
       value="movies/"
+    />
+  </div>
+  {% elif renaming_type == "Spécial (OAV)" %}
+  <div class="form-group">
+    <label for="path">Chemin</label>
+    <input
+      type="text"
+      class="form-control"
+      id="path"
+      name="path"
+      placeholder="Renseignez un chemin"
+      value="series/"
     />
   </div>
   {% endif %}
@@ -78,14 +90,52 @@ title %} {% block content %}
         step="1"
       />
     </div>
-    {% endfor %} {% else %}
+    {% endfor %} {% elif renaming_type == "Film" %}
     <h5 align="center">Nom de la vidéo selectionnée.</h5>
     <div class="input-group mb-1">
       <div class="input-group-prepend col-12">
         <span class="input-group-text col-12">{{file_names[0]}}</span>
       </div>
     </div>
-    {% endif %}
+    {% elif renaming_type == "Spécial (OAV)"%}
+    <div class="form-group">
+      <label for="special">Nom spécial</label>
+      <input
+        type="text"
+        class="form-control"
+        id="special"
+        name="special"
+        placeholder="Renseignez un nom spécial (ex: OAV)"
+      />
+    </div>
+    <div class="form-group">
+      <label for="season">Numéro de saison</label>
+      <input
+        type="number"
+        class="form-control"
+        id="season"
+        name="season"
+        min="0"
+        step="1"
+        placeholder="Renseignez un numéro de saison"
+      />
+    </div>
+    <h5 align="center">Associez chaque épisode à un numéro.</h5>
+    {% for name in file_names %}
+    <div class="input-group mb-1">
+      <div class="input-group-prepend col-11">
+        <span class="input-group-text col-12">{{name}}</span>
+      </div>
+      <input
+        type="number"
+        class="form-control text-center"
+        id="{{name}}"
+        name="{{name}}"
+        min="0"
+        step="1"
+      />
+    </div>
+    {% endfor %} {% endif %}
     <br />
     <!-- type="submit" pour que le formulaire soit "envoyé"-->
     <button type="submit" class="btn btn-primary">Suivant</button>
