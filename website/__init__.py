@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 
 def create_app():
     """
@@ -11,7 +11,7 @@ def create_app():
     # Pour empecher ce reculer d'une page
     @app.after_request
     def after_request(response):
-        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, post-check=0, pre-check=0, max-age=0"
+        response.headers["Cache-Control"] = "public, no-cache, no-store, must-revalidate, post-check=0, pre-check=0, max-age=0"
         return response
 
     from .views import views

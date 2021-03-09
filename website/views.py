@@ -10,8 +10,7 @@ def home():
 
     # Enlever de la memoire "file_names" et "renaming_type"
     if request.method == "GET":
-        for key in list(session.keys()):
-            session.pop(key)
+        session["token"] = False
 
     if request.method == "POST":
         file_names = request.form.getlist("pickfiles")
@@ -27,8 +26,9 @@ def home():
             flash("Impossible de renommer plus d'un film à la fois.", category="error")
         else:
             session["renaming_type"] = renaming_type
+            session["token"] = True
             return redirect(url_for("views.info"))
-
+            
     return render_template("home.html")
 
 
@@ -37,12 +37,15 @@ def info():
 
     no_error = True
 
-    # Pour checker si on est passé par "/"
-    if session.get("file_names") is None:
-        return redirect(url_for("views.home"))
-
     file_names = session.get("file_names")
     renaming_type = session.get("renaming_type")
+
+    # Pour checker si on est passé par "/"
+    if request.method == "GET":
+        if session.get("token"):
+            session["token"] = False
+        else:
+            return redirect(url_for("views.home"))
     
     if request.method == "POST":
         
@@ -102,8 +105,6 @@ def info():
                 new_files_name.append(new_file_name)
                 old_files_name.append(file_names[0])
 
-                os.rename(old_file_path, os.path.join(dir_path, new_file_name))
-
             if renaming_type == "Série":
                 for serie, nb in movies_dict.items():
                     old_file_path = os.path.join(dir_path, serie)
@@ -114,13 +115,11 @@ def info():
                     new_files_name.append(new_file_name)
                     old_files_name.append(serie)
 
-                    os.rename(old_file_path, new_file_path)
-
             session["dir_path"] = dir_path
             session["new_files_name"] = new_files_name
             session["old_files_name"] = old_files_name
+            session["token"] = True
 
-            flash("Vidéo(s) renommée(s) !", category="success")
             return redirect(url_for("views.completed_actions"))
 
     return render_template("info.html", renaming_type=renaming_type, file_names=file_names)
@@ -129,9 +128,12 @@ def info():
 @views.route("/completed-actions", methods=["GET", "POST"])
 def completed_actions():
 
-    # Pour checker si on est passé par "/"
-    if session.get("file_names") is None:
-        return redirect(url_for("views.home"))
+    # Pour checker si on est passé par "/" et "/info"
+    if request.method == "GET":
+        if session.get("token"):
+            session["token"] = False
+        else:
+            return redirect(url_for("views.home"))
 
     dir_path = session.get("dir_path")
     new_files_name = session.get("new_files_name")
@@ -139,11 +141,13 @@ def completed_actions():
 
     if request.method == "POST":
         if request.form.get("ok_button") == "clicked":
-            return redirect(url_for("views.home"))
+            for i in range(len(new_files_name)):
+                os.rename(os.path.join(dir_path, old_files_name[i]), os.path.join(dir_path, new_files_name[i]))
+            flash("Fichiers renommés !", category="succes")
+            return redirect(url_for("views.info"))
     
         elif request.form.get("cancel_button") == "clicked":
-            for i in range(len(new_files_name)):
-                os.rename(os.path.join(dir_path, new_files_name[i]), os.path.join(dir_path, old_files_name[i]))
+            flash("Fichiers non renommés.", category="error")
             return redirect(url_for("views.home"))
 
     return render_template("completed-actions.html", new_files_name=new_files_name, old_files_name=old_files_name)
