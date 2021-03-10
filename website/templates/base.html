@@ -22,16 +22,41 @@
   </head>
   <body>
     <!-- Barre de navigation Bootstrap-->
-    <nav class="navbar navbar-dark bg-dark">
-      <a class="navbar-brand" href="/">Renommeur de fichiers vidéos</a>
+    {% if user.is_authenticated %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <!-- Bouton qui s'affiche quand la fenetre est petite -->
+      <button
+        class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#navbar"
+      >
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- Boutons principaux de la barre -->
+      <div class="collapse navbar-collapse" id="navbar">
+        <div class="navbar-nav">
+          <a class="nav-item nav-link active" id="home" href="/"
+            >{{ user.id_name }}</a
+          >
+          <a class="nav-item nav-link" id="logout" href="/logout"
+            >Déconnexion</a
+          >
+        </div>
+      </div>
     </nav>
+    {% else %}
+    <nav class="navbar navbar-dark bg-dark">
+      <span class="navbar-brand mb-0 h1">Renommeur de fichiers vidéos</span>
+    </nav>
+    {% endif %}
 
     <!-- Récupération des message flash qui ont une catégorie  -->
-    {% with messages = get_flashed_messages(with_categories=true) %} 
-    {% if messages %} 
-      {% for category, message in messages %}
+    {% with messages = get_flashed_messages(with_categories=true) %} {% if
+    messages %} {% for category, message in messages %}
     <!-- Si la catégorie du flash est "error" -->
-      {% if category == 'error' %}
+    {% if category == 'error' %}
     <div class="alert alert-danger alter-dismissable fade show" role="alert">
       {{ message }}
       <button type="button" class="close" data-dismiss="alert">
@@ -46,10 +71,7 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
-        {% endif %} 
-      {% endfor %} 
-    {% endif %} 
-    {% endwith %}
+    {% endif %} {% endfor %} {% endif %} {% endwith %}
 
     <!-- Interieur de la page -->
     <div class="container">{% block content %} {% endblock content %}</div>

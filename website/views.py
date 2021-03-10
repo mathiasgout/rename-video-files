@@ -1,11 +1,15 @@
 import os
 import cv2
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from flask_login import login_required, current_user
+from .models import Renamed
+from . import db
 
 views = Blueprint("views", __name__)
 
 
 @views.route("/", methods=["GET", "POST"])
+@login_required
 def home():
 
     # Enlever de la memoire "file_names" et "renaming_type"
@@ -31,10 +35,11 @@ def home():
             session["token"] = True
             return redirect(url_for("views.info"))
             
-    return render_template("home.html")
+    return render_template("home.html", user=current_user)
 
 
 @views.route("/info", methods=["GET", "POST"])
+@login_required
 def info():
 
     no_error = True
@@ -127,7 +132,6 @@ def info():
             new_files_name = []
             old_files_name = []
             new_title = titre.strip().replace(" ", "-").lower()
-            special = special.strip().replace(" ", "-").upper()
 
             if renaming_type == "Film":
                 old_file_path = os.path.join(dir_path, file_names[0])
@@ -149,6 +153,7 @@ def info():
 
             if renaming_type == "Spécial":
                 for serie, nb in movies_dict.items():
+                    special = special.strip().replace(" ", "-").upper()
                     old_file_path = os.path.join(dir_path, serie)
                     movie_infos = get_file_infos(old_file_path)
 
@@ -167,10 +172,11 @@ def info():
 
             return redirect(url_for("views.completed_actions"))
 
-    return render_template("info.html", renaming_type=renaming_type, file_names=file_names)
+    return render_template("info.html", renaming_type=renaming_type, file_names=file_names, user=current_user)
 
 
 @views.route("/completed-actions", methods=["GET", "POST"])
+@login_required
 def completed_actions():
 
     # Pour checker si on est passé par "/" et "/info"
@@ -195,7 +201,7 @@ def completed_actions():
             flash("Fichiers non renommés.", category="error")
             return redirect(url_for("views.home"))
 
-    return render_template("completed-actions.html", new_files_name=new_files_name, old_files_name=old_files_name)
+    return render_template("completed-actions.html", new_files_name=new_files_name, old_files_name=old_files_name, user=current_user)
 
 
 def get_file_infos(file_path):
