@@ -22,9 +22,10 @@
   </head>
   <body>
     <!-- Barre de navigation Bootstrap-->
-    {% if user.is_authenticated %}
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <!-- Bouton qui s'affiche quand la fenetre est petite -->
+      <span class="navbar-brand mb-0 h1">Renommeur de fichiers vidéos</span>
+      {% if user.is_authenticated %}
       <button
         class="navbar-toggler"
         type="button"
@@ -45,12 +46,8 @@
           >
         </div>
       </div>
+      {% endif %}
     </nav>
-    {% else %}
-    <nav class="navbar navbar-dark bg-dark">
-      <span class="navbar-brand mb-0 h1">Renommeur de fichiers vidéos</span>
-    </nav>
-    {% endif %}
 
     <!-- Récupération des message flash qui ont une catégorie  -->
     {% with messages = get_flashed_messages(with_categories=true) %} {% if

@@ -193,7 +193,12 @@ def completed_actions():
     if request.method == "POST":
         if request.form.get("ok_button") == "clicked":
             for i in range(len(new_files_name)):
-                os.rename(os.path.join(dir_path, old_files_name[i]), os.path.join(dir_path, new_files_name[i]))
+                new_file_name = new_files_name[i]
+                old_file_name = old_files_name[i]
+                os.rename(os.path.join(dir_path, old_file_name), os.path.join(dir_path, new_file_name))
+                new_rename = Renamed(old_name=old_file_name, new_name=new_file_name, user_id=current_user.id)
+                db.session.add(new_rename)
+            db.session.commit()
             flash("Fichiers renommés !", category="succes")
             return redirect(url_for("views.info"))
     
