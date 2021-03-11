@@ -112,7 +112,6 @@ def info():
             for movie in file_names:
                 if not os.path.exists(os.path.join(dir_path, movie)):
                     no_error = False
-                    print(os.path.join(dir_path, movie))
                     flash("Le chemin n'est pas bon.", category="error")
                     break
             if len(titre) < 1 or len(titre) > 100:
